@@ -22,7 +22,7 @@ class RoomService(BaseService):
         )
 
     async def get_room(self, room_id: int, hotel_id: int):
-        room =  await self.db.rooms.get_onewith_rels(id=room_id, hotel_id=hotel_id)
+        room =  await self.db.rooms.get_one_with_rels(id=room_id, hotel_id=hotel_id)
         return room
 
     async def crete_room(
