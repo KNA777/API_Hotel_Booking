@@ -1,12 +1,16 @@
 # ruff: noqa: E402
 import json
+import os
+
 import pytest
 
 from unittest import mock
 
+from dotenv import load_dotenv
+
 mock.patch("fastapi_cache.decorator.cache", lambda *args, **kwargs: lambda f: f).start()
 
-from httpx import AsyncClient
+from httpx import AsyncClient, ASGITransport
 
 from src.api.dependencies import get_db
 from src.config import settings
@@ -62,7 +66,7 @@ async def add_data_hotel(register_user):
 
 @pytest.fixture(scope="session")
 async def ac(setup_database) -> AsyncClient:
-    async with AsyncClient(app=app, base_url="http://test") as ac:
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
         yield ac
 
 
