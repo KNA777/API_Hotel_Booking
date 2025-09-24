@@ -15,16 +15,18 @@ from src.database import BaseOrm, engine_null_pool, async_session_maker_null_pol
 from src.main import app
 from src.shemas.hotels import HotelAdd
 from src.shemas.rooms import RoomAdd
-from src.models import *    # noqa: F403
+from src.models import *  # noqa: F403
 
 
 @pytest.fixture(scope="session", autouse=True)
 async def check_test_mode():
     assert settings.MODE == "TEST"
 
-async def db_null_pool():      # -> DBManager
+
+async def db_null_pool():  # -> DBManager
     async with DBManager(async_session_maker_null_poll) as db:
         yield db
+
 
 @pytest.fixture(scope="function")  # -> DBManager
 async def db() -> DBManager:
@@ -73,6 +75,7 @@ async def register_user(ac, setup_database):
             "password": "12345678"
         })
 
+
 @pytest.fixture(scope="session")
 async def auth_ac(ac, register_user):
     await ac.post(
@@ -84,26 +87,3 @@ async def auth_ac(ac, register_user):
     )
     assert ac.cookies["access_token"]
     yield ac
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
