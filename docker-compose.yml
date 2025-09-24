@@ -9,6 +9,11 @@ services:
       - myNetwork
     env_file:
       - .env
+    depends_on:
+      booking_db_service:
+        condition: service_healthy
+      booking_redis_service:
+        condition: service_healthy
 
 
   booking_celery_worker_service:
@@ -32,6 +37,41 @@ services:
       - .env
     command: "celery -A src.tasks.celery_app:celery_instance beat -l INFO"
 
+  booking_db_service:
+    image: postgres:17
+    container_name: "booking_db_container"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: booking
+    ports:
+      - "6432:5432"
+    networks:
+      - myNetwork
+    volumes:
+      - booking_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d booking" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  booking_redis_service:
+    image: redis:7.4
+    container_name: "redis_booking_container"
+    ports:
+      - "7379:6379"
+    networks:
+      - myNetwork
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
 networks:
   myNetwork:
-    external: true
+    driver: bridge
+
+volumes:
+  booking_data:
