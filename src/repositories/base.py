@@ -61,14 +61,11 @@ class BaseRepository:
         stmt = (
             update(self.model)
             .filter_by(**filter_by)
-            .values(**data.model_dump(exclude_unset=exclude_unset))     # exclude_unset=True - те поля которые
-        )                                                               # не изменялись, не будут записываться
-                                                                        # как null в таблицу
+            .values(**data.model_dump(exclude_unset=exclude_unset))
+        )
+
         await self.session.execute(stmt)
 
     async def delete(self, **filter_by):
         stmt = delete(self.model).filter_by(**filter_by)
         await self.session.execute(stmt)
-
-    # from_attributes=True это чтобы pydantic схема смогла перевести объект SQLAlchemy в pydantic объект
-    # благодаря этому параметру pydantic может брать атрибуты других классов(HotelsOrm)
